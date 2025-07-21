@@ -1,12 +1,11 @@
 //
 //  Extensions.swift
-//  Weather-Rive-IOS
+//  Weather
 //
-//  Created by jatin foujdar on 21/07/25.
+//  Created by Dara To on 2022-05-30.
 //
 
 import SwiftUI
-
 
 enum LinearGradientColor {
     static let background = LinearGradient(gradient: Gradient(colors: [Color("Background 1"), Color("Background 2")]), startPoint: .topLeading, endPoint: .bottomTrailing)
@@ -21,5 +20,4 @@ enum LinearGradientColor {
     static let forecastCardBackground = Color("Forecast Card Background")
     static let probabilityText = Color("Probability Text")
 }
-
 
