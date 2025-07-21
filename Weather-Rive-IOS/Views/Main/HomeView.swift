@@ -9,36 +9,40 @@ import SwiftUI
 
 struct HomeView: View {
     var body: some View {
-        ZStack{
-            LinearGradientColor.background
-                .ignoresSafeArea()
-            
-            Image("Background")
-                .resizable()
-                .ignoresSafeArea()
-            
-            Image("House")
-                .frame(maxHeight: .infinity, alignment: .top)
-                .padding(.top, 257)
-            
-            
-            VStack(spacing: -10){
-                Text("Mumbai")
-                .font(.largeTitle)
+        NavigationView {
+            ZStack{
+                LinearGradientColor.background
+                    .ignoresSafeArea()
                 
-                VStack{
-                    Text(attributedString)
+                Image("Background")
+                    .resizable()
+                    .ignoresSafeArea()
+                
+                Image("House")
+                    .frame(maxHeight: .infinity, alignment: .top)
+                    .padding(.top, 257)
+                
+                
+                VStack(spacing: -10){
+                    Text("Mumbai")
+                        .font(.largeTitle)
                     
-                    Text("H:24°  |  L:15° ")
-                        .font(.title3.weight(.semibold))
+                    VStack{
+                        Text(attributedString)
+                        
+                        Text("H:24°  |  L:15° ")
+                            .font(.title3.weight(.semibold))
+                        
+                    }
                     
+                    Spacer()
                 }
-            
-            Spacer()
+                .padding(.top, 51)
+                
+                TabBarView(action: {})
+            }
+            .navigationBarHidden(true)
         }
-        .padding(.top, 51)
-        
-    }
 }
     private var attributedString: AttributedString {
         var string = AttributedString("19° " + "\n " + "Mostly Clear")
