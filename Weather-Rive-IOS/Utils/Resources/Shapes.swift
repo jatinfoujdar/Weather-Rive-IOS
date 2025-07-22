@@ -2,8 +2,6 @@
 //  Shapes.swift
 //  Weather
 //
-//  Created by Dara To on 2022-05-30.
-//
 
 import SwiftUI
 
