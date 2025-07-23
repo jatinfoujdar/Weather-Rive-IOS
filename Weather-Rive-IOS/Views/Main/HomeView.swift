@@ -1,6 +1,8 @@
 import SwiftUI
 import BottomSheet
 
+// MARK: - Custom Detents
+
 enum BottomSheetPosition: CGFloat, CaseIterable {
     case top = 0.83
     case middle = 0.385
@@ -10,12 +12,28 @@ enum BottomSheetPosition: CGFloat, CaseIterable {
     }
 }
 
+// MARK: - PreferenceKey to Track Y Offset
+
+struct BottomSheetOffsetKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
+// MARK: - HomeView
 
 struct HomeView: View {
-    @State var isBottomSheetPresented = true
+    @State private var isBottomSheetPresented = true
     @State private var selectedPosition: BottomSheetPosition = .middle
+    @State private var bottomSheetTranslation: CGFloat = BottomSheetPosition.middle.rawValue
 
- 
+    var bottomSheetTranslationProrated: CGFloat{
+        (bottomSheetTranslation - BottomSheetPosition.middle.rawValue) / (BottomSheetPosition.top.rawValue - BottomSheetPosition.middle.rawValue)
+    }
+    
+    
     private var selectedDetent: Binding<BottomSheet.PresentationDetent> {
         Binding(
             get: { selectedPosition.bottomSheetDetent },
@@ -29,56 +47,70 @@ struct HomeView: View {
 
     var body: some View {
         NavigationView {
-            ZStack {
-                LinearGradientColor.background
-                    .ignoresSafeArea()
-
-                Image("Background")
-                    .resizable()
-                    .ignoresSafeArea()
-
-                Image("House")
-                    .frame(maxHeight: .infinity, alignment: .top)
-                    .padding(.top, 257)
-
-                VStack(spacing: -10) {
-                    Text("Mumbai")
-                        .font(.largeTitle)
-
-                    VStack {
-                        Text(attributedString)
-                        Text("H:24°  |  L:15° ")
-                            .font(.title3.weight(.semibold))
-                    }
-
-                    Spacer()
-                }
-                .padding(.top, 51)
-
-                EmptyView()
-                    .sheetPlus(
-                        isPresented: $isBottomSheetPresented,
-                        background: (
-                            ForecastView()
-                        ),
-                        main: {
-                            EmptyView()
-                                .presentationDetentsPlus(
-                                    [.height(0), .medium, .large],
-                                    selection: selectedDetent
-                                )
+            GeometryReader { geometryReader in
+                let screenHeight = geometryReader.size.height + geometryReader.safeAreaInsets.top + geometryReader.safeAreaInsets.bottom
+                ZStack {
+                    LinearGradientColor.background
+                        .ignoresSafeArea()
+                    
+                    Image("Background")
+                        .resizable()
+                        .ignoresSafeArea()
+                    
+                    Image("House")
+                        .frame(maxHeight: .infinity, alignment: .top)
+                        .padding(.top, 257)
+                    
+                    VStack(spacing: -10) {
+                        Text("Mumbai")
+                            .font(.largeTitle)
+                        
+                        VStack {
+                            Text(attributedString)
+                            Text("H:24°  |  L:15° ")
+                                .font(.title3.weight(.semibold))
                         }
-                    )
-
-                TabBarView(action: {
-                    selectedPosition = .top
-                    isBottomSheetPresented = true
-                })
-
+                        
+                        Spacer()
+                    }
+                    .padding(.top, 51)
+                    
+                    // Bottom Sheet
+                    EmptyView()
+                        .sheetPlus(
+                            isPresented: $isBottomSheetPresented,
+                            background: ForecastView(),
+                            main: {
+                                GeometryReader { geo in
+                                    Color.clear
+                                        .preference(
+                                            key: BottomSheetOffsetKey.self,
+                                            value: geo.frame(in: .global).minY
+                                        )
+                                        .presentationDetentsPlus(
+                                            [.height(0), .medium, .large],
+                                            selection: selectedDetent
+                                        )
+                                }
+                            }
+                        )
+                        .onPreferenceChange(BottomSheetOffsetKey.self) { value in
+                            bottomSheetTranslation = value / screenHeight
+                            //                        print("Bottom Sheet Y offset:", value)
+                        }
+                    
+                    // Tab Bar
+                    TabBarView(action: {
+                        selectedPosition = .top
+                        isBottomSheetPresented = true
+                    })
+                }
+                .navigationBarHidden(true)
             }
-            .navigationBarHidden(true)
         }
     }
+
+    // MARK: - Attributed Weather Text
 
     private var attributedString: AttributedString {
         var string = AttributedString("19°\nMostly Clear")
@@ -87,6 +119,7 @@ struct HomeView: View {
             string[temp].font = .system(size: 96, weight: .thin)
             string[temp].foregroundColor = .primary
         }
+
         if let weather = string.range(of: "Mostly Clear") {
             string[weather].font = .title3.weight(.semibold)
             string[weather].foregroundColor = .secondary
@@ -96,6 +129,7 @@ struct HomeView: View {
     }
 }
 
+// MARK: - Preview
 
 #Preview {
     HomeView()
