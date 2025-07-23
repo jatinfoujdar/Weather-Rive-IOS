@@ -49,6 +49,7 @@ struct HomeView: View {
         NavigationView {
             GeometryReader { geometryReader in
                 let screenHeight = geometryReader.size.height + geometryReader.safeAreaInsets.top + geometryReader.safeAreaInsets.bottom
+                let imageOffset = screenHeight + 36
                 ZStack {
                     LinearGradientColor.background
                         .ignoresSafeArea()
@@ -56,10 +57,12 @@ struct HomeView: View {
                     Image("Background")
                         .resizable()
                         .ignoresSafeArea()
+                        .offset(y: bottomSheetTranslationProrated > 0 ? 0 * imageOffset : bottomSheetTranslationProrated > 1 ? -1 * imageOffset : -bottomSheetTranslationProrated * imageOffset)
                     
                     Image("House")
                         .frame(maxHeight: .infinity, alignment: .top)
                         .padding(.top, 257)
+                        .offset(y: bottomSheetTranslationProrated > 0 ? 0 * imageOffset : bottomSheetTranslationProrated > 1 ? -1 * imageOffset : -bottomSheetTranslationProrated * imageOffset)
                     
                     VStack(spacing: -10) {
                         Text("Mumbai")
