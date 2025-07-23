@@ -12,13 +12,14 @@ struct ForecastView: View {
         ScrollView{
             
         }
-        .background(Blur(radius: 25, opaque: true))
+        .backgroundBlur(radius: 25, opaque: true)
         .background(LinearGradientColor.bottomSheetBackground)
         .clipShape(RoundedRectangle(cornerRadius: 44))
+        .innerShadow(shape: RoundedRectangle(cornerRadius: 44), color: LinearGradientColor.bottomSheetBorderMiddle, lineWidth: 1, offsetX: 0, offsetY: 1, blur: 0, blendMode: .overlay, opacity: 1)
         .overlay{
             Divider()
                 .blendMode(.overlay)
-                .background(LinearGradientColor.bottomSheetBackground)
+                .background(LinearGradientColor.bottomSheetBorderTop)
                 .frame(maxHeight: .infinity, alignment: .top)
                 .clipShape(RoundedRectangle(cornerRadius: 44))
         }
