@@ -1,140 +1,120 @@
+//
+//  HomeView.swift
+//  Weather
+//
+//  Created by Jatin Foujdar To on 2025-07-12.
+//
+
 import SwiftUI
 import BottomSheet
 
-// MARK: - Custom Detents
-
 enum BottomSheetPosition: CGFloat, CaseIterable {
-    case top = 0.83
+    case top = 0.83 
     case middle = 0.385
-
-    var bottomSheetDetent: BottomSheet.PresentationDetent {
-        .fraction(self.rawValue)
-    }
 }
-
-// MARK: - PreferenceKey to Track Y Offset
-
-struct BottomSheetOffsetKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
-// MARK: - HomeView
 
 struct HomeView: View {
-    @State private var isBottomSheetPresented = true
-    @State private var selectedPosition: BottomSheetPosition = .middle
-    @State private var bottomSheetTranslation: CGFloat = BottomSheetPosition.middle.rawValue
-
-    var bottomSheetTranslationProrated: CGFloat{
+    @State var bottomSheetPosition: BottomSheetPosition = .middle
+    @State var bottomSheetTranslation: CGFloat = BottomSheetPosition.middle.rawValue
+    @State var hasDragged: Bool = false
+    
+    var bottomSheetTranslationProrated: CGFloat {
         (bottomSheetTranslation - BottomSheetPosition.middle.rawValue) / (BottomSheetPosition.top.rawValue - BottomSheetPosition.middle.rawValue)
     }
     
-    
-    private var selectedDetent: Binding<BottomSheet.PresentationDetent> {
-        Binding(
-            get: { selectedPosition.bottomSheetDetent },
-            set: { newValue in
-                if let matched = BottomSheetPosition.allCases.first(where: { $0.bottomSheetDetent == newValue }) {
-                    selectedPosition = matched
-                }
-            }
-        )
-    }
-
     var body: some View {
         NavigationView {
-            GeometryReader { geometryReader in
-                let screenHeight = geometryReader.size.height + geometryReader.safeAreaInsets.top + geometryReader.safeAreaInsets.bottom
+            GeometryReader { geometry in
+                let screenHeight = geometry.size.height + geometry.safeAreaInsets.top + geometry.safeAreaInsets.bottom
                 let imageOffset = screenHeight + 36
+                
                 ZStack {
+                    // MARK: Background Color
                     LinearGradientColor.background
                         .ignoresSafeArea()
                     
+                    // MARK: Background Image
                     Image("Background")
                         .resizable()
                         .ignoresSafeArea()
-                        .offset(y: bottomSheetTranslationProrated > 0 ? 0 * imageOffset : bottomSheetTranslationProrated > 1 ? -1 * imageOffset : -bottomSheetTranslationProrated * imageOffset)
+                        .offset(y: -bottomSheetTranslationProrated * imageOffset)
                     
+                    // MARK: House Image
                     Image("House")
                         .frame(maxHeight: .infinity, alignment: .top)
                         .padding(.top, 257)
-                        .offset(y: bottomSheetTranslationProrated > 0 ? 0 * imageOffset : bottomSheetTranslationProrated > 1 ? -1 * imageOffset : -bottomSheetTranslationProrated * imageOffset)
+                        .offset(y: -bottomSheetTranslationProrated * imageOffset)
                     
-                    VStack(spacing: -10) {
-                        Text("Mumbai")
+                    // MARK: Current Weather
+                    VStack(spacing: -10 * (1 - bottomSheetTranslationProrated)) {
+                        Text("Montreal")
                             .font(.largeTitle)
                         
                         VStack {
                             Text(attributedString)
-                            Text("H:24°  |  L:15° ")
+                            
+                            Text("H:24°   L:18°")
                                 .font(.title3.weight(.semibold))
+                                .opacity(1 - bottomSheetTranslationProrated)
                         }
                         
                         Spacer()
                     }
                     .padding(.top, 51)
+                    .offset(y: -bottomSheetTranslationProrated * 46)
                     
-                    // Bottom Sheet
-                    EmptyView()
-                        .sheetPlus(
-                            isPresented: $isBottomSheetPresented,
-                            background: ForecastView(),
-                            main: {
-                                GeometryReader { geo in
-                                    Color.clear
-                                        .preference(
-                                            key: BottomSheetOffsetKey.self,
-                                            value: geo.frame(in: .global).minY
-                                        )
-                                        .presentationDetentsPlus(
-                                            [.height(0), .medium, .large],
-                                            selection: selectedDetent
-                                        )
-                                }
+                    // MARK: Bottom Sheet
+                    BottomSheetView(position: $bottomSheetPosition) {
+//                        Text(bottomSheetTranslationProrated.formatted())
+                    } content: {
+                        ForecastView()
+                    }
+                    .onBottomSheetDrag { translation in
+                        bottomSheetTranslation = translation / screenHeight
+                        
+                        withAnimation(.easeInOut) {
+                            if bottomSheetPosition == BottomSheetPosition.top {
+                                hasDragged = true
+                            } else {
+                                hasDragged = false
                             }
-                        )
-                        .onPreferenceChange(BottomSheetOffsetKey.self) { value in
-                            bottomSheetTranslation = value / screenHeight
-                            //                        print("Bottom Sheet Y offset:", value)
                         }
+                    }
                     
-                    // Tab Bar
+                    // MARK: Tab Bar
                     TabBarView(action: {
-                        selectedPosition = .top
-                        isBottomSheetPresented = true
+                        bottomSheetPosition = .top
                     })
+                    .offset(y: bottomSheetTranslationProrated * 115)
                 }
-                .navigationBarHidden(true)
             }
+            .navigationBarHidden(true)
         }
     }
-
-    // MARK: - Attributed Weather Text
-
+    
     private var attributedString: AttributedString {
-        var string = AttributedString("19°\nMostly Clear")
-
+        var string = AttributedString("19°" + (hasDragged ? " | " : "\n ") + "Mostly Clear")
+        
         if let temp = string.range(of: "19°") {
-            string[temp].font = .system(size: 96, weight: .thin)
-            string[temp].foregroundColor = .primary
+            string[temp].font = .system(size: (96 - (bottomSheetTranslationProrated * (96 - 20))), weight: hasDragged ? .semibold : .thin)
+            string[temp].foregroundColor = hasDragged ? .secondary : .primary
         }
-
+        
+        if let pipe = string.range(of: " | ") {
+            string[pipe].font = .title3.weight(.semibold)
+            string[pipe].foregroundColor = .secondary.opacity(bottomSheetTranslationProrated)
+        }
+        
         if let weather = string.range(of: "Mostly Clear") {
             string[weather].font = .title3.weight(.semibold)
             string[weather].foregroundColor = .secondary
         }
-
+        
         return string
     }
 }
 
-// MARK: - Preview
-
-#Preview {
-    HomeView()
-        .preferredColorScheme(.dark)
+#Preview{
+        HomeView()
+            .preferredColorScheme(.dark)
 }

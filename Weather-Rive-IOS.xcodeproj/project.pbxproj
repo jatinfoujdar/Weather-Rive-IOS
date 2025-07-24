@@ -340,7 +340,7 @@
 			repositoryURL = "https://github.com/Wouter125/BottomSheet";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.2;
+				minimumVersion = 1.4.5;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
