@@ -9,7 +9,7 @@ import SwiftUI
 import BottomSheet
 
 enum BottomSheetPosition: CGFloat, CaseIterable {
-    case top = 0.83 
+    case top = 0.83
     case middle = 0.385
 }
 
@@ -47,7 +47,7 @@ struct HomeView: View {
                     
                     // MARK: Current Weather
                     VStack(spacing: -10 * (1 - bottomSheetTranslationProrated)) {
-                        Text("Montreal")
+                        Text("Mumbai")
                             .font(.largeTitle)
                         
                         VStack {
