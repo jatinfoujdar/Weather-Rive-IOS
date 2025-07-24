@@ -67,7 +67,7 @@ struct HomeView: View {
                     BottomSheetView(position: $bottomSheetPosition) {
 //                        Text(bottomSheetTranslationProrated.formatted())
                     } content: {
-                        ForecastView()
+                        ForecastView(bottomSheetTranslationProrated: bottomSheetTranslationProrated)
                     }
                     .onBottomSheetDrag { translation in
                         bottomSheetTranslation = translation / screenHeight
@@ -93,9 +93,9 @@ struct HomeView: View {
     }
     
     private var attributedString: AttributedString {
-        var string = AttributedString("19°" + (hasDragged ? " | " : "\n ") + "Mostly Clear")
+        var string = AttributedString("29°" + (hasDragged ? " | " : "\n ") + "Mostly Clear")
         
-        if let temp = string.range(of: "19°") {
+        if let temp = string.range(of: "29°") {
             string[temp].font = .system(size: (96 - (bottomSheetTranslationProrated * (96 - 20))), weight: hasDragged ? .semibold : .thin)
             string[temp].foregroundColor = hasDragged ? .secondary : .primary
         }
