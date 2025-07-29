@@ -28,6 +28,16 @@ struct ForecastCard: View {
             VStack(spacing: 16){
                 Text(forecast.date, format: forecastPeriod == ForecastPeriod.hourly ? .dateTime.hour() : .dateTime.weekday())
                     .font(.subheadline.weight(.semibold))
+                
+                VStack(spacing: -4){
+                    Image("\(forecast.icon) small")
+                    
+                    Text(forecast.probability, format: .percent)
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(LinearGradientColor.probabilityText)
+                        .opacity(forecast.probability > 0 ? 1 : 0)
+                }
+                .frame(height: 42)
             }
             .padding(.horizontal,8)
             .padding(.vertical, 16)
