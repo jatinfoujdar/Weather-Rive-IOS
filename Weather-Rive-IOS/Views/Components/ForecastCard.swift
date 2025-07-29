@@ -10,7 +10,15 @@ import SwiftUI
 struct ForecastCard: View {
     var forecast: Forecast
     var forecastPeriod: ForecastPeriod
-    var isActive: Bool = true
+    var isActive: Bool  {
+        if forecastPeriod == ForecastPeriod.hourly {
+            let isThisHour = Calendar.current.isDate(.now, equalTo: forecast.date, toGranularity: .hour)
+            return isThisHour
+        }else{
+            let isToday = Calendar.current.isDate(.now, equalTo: forecast.date, toGranularity: .day)
+            return isToday
+        }
+    }
     
     var body: some View {
         ZStack{
@@ -38,6 +46,11 @@ struct ForecastCard: View {
                         .opacity(forecast.probability > 0 ? 1 : 0)
                 }
                 .frame(height: 42)
+                
+                Text("\(forecast.temperature)")
+                    .font(.title3)
+                
+                
             }
             .padding(.horizontal,8)
             .padding(.vertical, 16)
