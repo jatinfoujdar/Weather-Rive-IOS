@@ -17,7 +17,12 @@ struct ForecastView: View {
             VStack(spacing: 0) {
                 SegmentedControl(selection: $selection)
                 forecastScrollView
+                
+                Image("Forecast Widgets")
+                    .opacity(bottomSheetTranslationProrated)
             }
+            
+            
         }
         .backgroundBlur(radius: 25, opaque: true)
         .background(LinearGradientColor.bottomSheetBackground)
@@ -34,6 +39,8 @@ struct ForecastView: View {
         )
         .overlay(separator)
         .overlay(dragIndicator)
+        
+       
     }
     
     // MARK: - Forecast Cards ScrollView with Transition
