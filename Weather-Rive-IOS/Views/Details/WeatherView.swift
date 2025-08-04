@@ -27,10 +27,10 @@ struct WeatherView: View {
             }
         }
         .overlay{
-            NavigationBar()
+            NavigationBar(searchText: $searchText)
         }
         .navigationBarHidden(true)
-        .searchable(text: $searchText)
+//      .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search city")
     }
 }
 
