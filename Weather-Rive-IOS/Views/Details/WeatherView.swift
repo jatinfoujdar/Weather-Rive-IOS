@@ -25,8 +25,8 @@ struct WeatherView: View {
             
             ScrollView(showsIndicators: false){
                 VStack(spacing: 20){
-                    ForEach(Forecast.cities){forecast in
-                    WeatherWidget(forecast: forecast)
+                    ForEach(searchResults) { forecast in
+                        WeatherWidget(forecast: forecast)
                     }
                 }
             }
@@ -39,7 +39,7 @@ struct WeatherView: View {
             NavigationBar(searchText: $searchText)
         }
         .navigationBarHidden(true)
-//      .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search city")
+      .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search city")
     }
 }
 
