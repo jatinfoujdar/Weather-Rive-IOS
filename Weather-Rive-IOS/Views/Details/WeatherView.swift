@@ -9,6 +9,15 @@ import SwiftUI
 
 struct WeatherView: View {
     @State private var searchText: String = ""
+    
+    var searchResults: [Forecast]{
+        if searchText.isEmpty{
+            return Forecast.cities
+        }else{
+            return Forecast.cities.filter{$0.location.contains(searchText)}
+        }
+    }
+    
     var body: some View {
         ZStack{
             LinearGradientColor.background
