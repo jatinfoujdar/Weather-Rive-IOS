@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct WeatherView: View {
+    @State private var searchText: String = ""
     var body: some View {
         ZStack{
             LinearGradientColor.background
@@ -20,15 +21,22 @@ struct WeatherView: View {
                     }
                 }
             }
+            .safeAreaInset(edge: .top){
+                EmptyView()
+                    .frame(height: 110)
+            }
         }
         .overlay{
             NavigationBar()
         }
         .navigationBarHidden(true)
+        .searchable(text: $searchText)
     }
 }
 
 #Preview {
-    WeatherView()
-        .preferredColorScheme(.dark)
+    NavigationView {
+        WeatherView()
+            .preferredColorScheme(.dark)
+    }
 }
